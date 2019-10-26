@@ -2,7 +2,7 @@
     <div class="loginIndex">
       <div class="header" v-bind:style="{'top': '0px', 'width': width + 'px', 'height': (0.08 * height) + 'px'}">
         <img class="logo" :src="logoPhoto()" v-bind:style="{'width': (0.06 * height) + 'px', 'top': (0.01 * height) + 'px', 'left': (0.02 * height) + 'px'}">
-        <i  v-bind:style="{'top': (0.01 * height) + 'px', 'left': (0.1 * height) + 'px', 'font-size': (0.04 * height) + 'px'}">学生课堂考勤管理系统</i>
+        <i v-bind:style="{'top': (0.01 * height) + 'px', 'left': (0.1 * height) + 'px', 'font-size': (0.04 * height) + 'px'}">学生课堂考勤管理系统</i>
         <div class="rightTop" v-bind:style="{'right': (height*0.03) + 'px', 'top': (height*0.02) + 'px','height': (height*0.02) + 'px'}">
           <i class="el-icon-user"></i>
           <el-button type="text" v-on:click="goToRegister()" v-bind:style="{'font-size': (height*0.018) + 'px'}">立即注册</el-button>

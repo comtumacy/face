@@ -15,7 +15,7 @@ import store from './store/store'
 // 导入HTTP拦截器
 import './http/http'
 // 按需导入Element UI组件库包
-import { Icon, Button, ButtonGroup, Divider, Row, Col, Input, Checkbox, CheckboxButton, CheckboxGroup, Message, MessageBox } from 'element-ui'
+import { Icon, Button, ButtonGroup, Divider, Row, Col, Input, Checkbox, CheckboxButton, CheckboxGroup, Message, MessageBox, Container, Aside, Main, Form, FormItem, Select, Option, OptionGroup } from 'element-ui'
 
 // 关闭生产模式
 Vue.config.productionTip = false
@@ -39,6 +39,14 @@ Vue.use(Input)
 Vue.use(Checkbox)
 Vue.use(CheckboxButton)
 Vue.use(CheckboxGroup)
+Vue.use(Container)
+Vue.use(Aside)
+Vue.use(Main)
+Vue.use(Form)
+Vue.use(FormItem)
+Vue.use(Select)
+Vue.use(Option)
+Vue.use(OptionGroup)
 
 // 挂载
 new Vue({
