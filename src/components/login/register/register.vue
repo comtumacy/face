@@ -56,10 +56,10 @@ export default {
       } else {
         this.height = 800
       }
-      if (width > 1300) {
+      if (width > 1710) {
         this.width = width
       } else {
-        this.width = 1300
+        this.width = 1710
       }
     }
   },

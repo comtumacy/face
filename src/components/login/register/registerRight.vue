@@ -27,34 +27,44 @@
         <el-row>
           <el-form-item label="性别" prop="Ssex">
             <el-col>
-              <el-select v-model="ruleForm.Ssex" placeholder="请选择性别">
+              <el-select v-model="ruleForm.Ssex" placeholder="请选择性别" v-bind:style="{'width': '100%'}">
                 <el-option label="男" value="男"></el-option>
                 <el-option label="女" value="女"></el-option>
               </el-select>
             </el-col>
           </el-form-item>
         </el-row>
-        <el-form-item label="所属科室" prop="department">
-          <el-select  v-model="ruleForm.department" placeholder="请选择科室">
-            <el-option :label="itemDepartment" :value="itemDepartment" v-for="itemDepartment in department" :key="itemDepartment"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="手机号" prop="tel">
-          <el-input v-model="ruleForm.tel"></el-input>
-        </el-form-item>
+        <el-row>
+          <el-form-item label="所属学院" prop="Sdept">
+            <el-col>
+              <el-select  v-model="ruleForm.Sdept" placeholder="请选择学院" v-bind:style="{'width': '100%'}">
+                <el-option :label="itemCollege" :value="itemCollege" v-for="itemCollege in college" :key="itemCollege"></el-option>
+              </el-select>
+            </el-col>
+          </el-form-item>
+        </el-row>
+        <el-row>
+          <el-form-item label="所属班级" prop="class">
+            <el-col>
+              <el-select  v-model="ruleForm.class" placeholder="请选择班级" v-bind:style="{'width': '100%'}">
+                <el-option :label="itemClass" :value="itemClass" v-for="itemClass in classes" :key="itemClass"></el-option>
+              </el-select>
+            </el-col>
+          </el-form-item>
+        </el-row>
         <el-form-item label="验证码" prop="captcha">
           <el-row>
             <el-col :span="12">
               <el-input v-model="ruleForm.captcha"></el-input>
             </el-col>
             <el-col :span="12">
+              <img id="verificationCodeImg" v-bind:src="'data:image/png;base64,' + captchaImg" v-on:click="refreshCaptchaImg()">
             </el-col>
           </el-row>
-          <!--              <img id="verificationCodeImg" v-bind:src="verificationCodeImg()" v-on:click="refreshCaptchaImg()">-->
         </el-form-item>
       </el-form>
       <el-row>
-        <el-checkbox v-model="checked">
+        <el-checkbox class="selectBox" v-model="checked">
           请阅读
           <el-button type="text">《服务条款》</el-button>
         </el-checkbox>
@@ -70,6 +80,8 @@ export default {
   components: {},
   props: ['width', 'height'],
   created () {
+    this.getCollege()
+    this.getCaptchaImg()
   },
   data () {
     let validatePass = (rule, value, callback) => {
@@ -92,18 +104,25 @@ export default {
       }
     }
     return {
-      department: '',
+      college: '',
+      classes: '',
       checked: false,
+      captchaImg: '',
       ruleForm: {
         username: '',
         password: '',
         checkPass: '',
-        department: '',
-        gender: '',
-        tel: '',
+        Sname: '',
+        Ssex: '',
+        Sdept: '',
+        class: '',
         captcha: ''
       },
       rules: {
+        Sno: [
+          { required: true, message: '请输入用户名', trigger: 'blur' },
+          { min: 12, max: 12, message: '长度为 12 个数字', trigger: 'blur' }
+        ],
         username: [
           { required: true, message: '请输入用户名', trigger: 'blur' },
           { min: 5, max: 12, message: '长度在 5 到 12 个字符', trigger: 'blur' }
@@ -118,15 +137,18 @@ export default {
           { min: 10, message: '为了安全，密码长度请大于 10 个字符', trigger: 'blur' },
           { validator: validatePass2, trigger: 'blur' }
         ],
-        department: [
-          { required: true, message: '请选择科室', trigger: 'change' }
+        Sname: [
+          { required: true, message: '请输入姓名', trigger: 'blur' },
+          { min: 5, max: 12, message: '长度在 1 到 10 个字符', trigger: 'blur' }
         ],
-        gender: [
+        Sdept: [
+          { required: true, message: '请选择学院', trigger: 'change' }
+        ],
+        class: [
+          { required: true, message: '请选择班级', trigger: 'change' }
+        ],
+        Ssex: [
           { required: true, message: '请选择性别', trigger: 'change' }
-        ],
-        tel: [
-          { required: true, message: '请输入手机号', trigger: 'blur' },
-          { min: 11, max: 11, message: '手机号应为11位数', trigger: 'blur' }
         ],
         captcha: [
           { required: true, message: '请输入验证码', trigger: 'blur' },
@@ -135,8 +157,18 @@ export default {
       }
     }
   },
-  computed: {},
-  watch: {},
+  computed: {
+  },
+  watch: {
+    // 深度监听对象内部属性的改变
+    'ruleForm.Sdept': {
+      handler () {
+        this.getClass()
+      },
+      deep: true,
+      immediate: false
+    }
+  },
   methods: {
     // 点击注册按钮事件
     submitForm (ruleForm) {
@@ -167,22 +199,59 @@ export default {
         }
       })
     },
-    // 返回验证码图片
-    verificationCodeImg () {
-      return this.captchaImg
+    // 刷新验证码图片
+    refreshCaptchaImg () {
+      this.$message.success('刷新验证码成功')
+      this.getCaptchaImg()
     },
     // 获取验证码图片
     getCaptchaImg () {
       this.$axios({
         method: 'post',
-        url: 'http://yitongli.cn/api/captcha/getCaptcha',
-        responseType: 'arraybuffer'
+        url: 'http://localhost:2720/face/user/verification_code'
       }).then(res => {
         this.ctoken = res.headers.ctoken
-        this.captchaImg = 'data:image/png;base64,' + btoa(
-          new Uint8Array(res.data)
-            .reduce((data, byte) => data + String.fromCharCode(byte), '')
-        )
+        this.captchaImg = res.data.base64
+      }).catch(err => {
+        this.$message.error('获取验证码图片失败，请检查你的网络连接')
+        console.log(err)
+      })
+    },
+    // 获取学院数据
+    getCollege () {
+      this.$axios({
+        method: 'post',
+        url: 'http://localhost:2720/face/public/get_college'
+      }).then(res => {
+        if (res.status === 200) {
+          let list = []
+          for (let i = 0; i < res.data.length; i++) {
+            list.push(res.data[i].Cname)
+          }
+          this.college = list
+        } else {
+          this.$message.error('获取学院数据失败，请检查你的网络连接')
+        }
+      }).catch(err => {
+        console.log(err)
+      })
+    },
+    // 获取班级数据
+    getClass () {
+      this.$axios({
+        method: 'post',
+        url: 'http://localhost:2720/face/public/get_class',
+        data: { 'college': this.ruleForm.Sdept }
+      }).then(res => {
+        if (res.status === 200) {
+          let list = []
+          for (let i = 0; i < res.data.length; i++) {
+            list.push(res.data[i].Cid + res.data[i].Cname)
+          }
+          this.classes = list
+        } else {
+          this.$message.error('获取班级数据失败，请检查你的网络连接')
+        }
       }).catch(err => {
         console.log(err)
       })
@@ -199,6 +268,8 @@ export default {
 .registerRight
   .registerRightRow1
     height 26px
+    > img
+      margin 5px
     .registerRightTitle
       margin-left 20px
       font-size 22px
@@ -213,4 +284,9 @@ export default {
         font-size 15px
   .el-divider
     margin 6px 0 12px 0
+  .selectBox
+    margin-left 100px
+  .button
+    margin-left 100px
+    width 78%
 </style>
