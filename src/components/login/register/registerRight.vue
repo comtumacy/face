@@ -4,7 +4,7 @@
         <el-col class="registerRightTitle" :span="12">注册新用户</el-col>
         <el-col class="registerRightTitle2" :span="12">
           我已经注册，现在就
-          <el-button class="registerRightButton" type="text">登录</el-button>
+          <el-button class="registerRightButton" type="text" v-on:click="toLogin()">登录</el-button>
         </el-col>
       </el-row>
       <el-divider></el-divider>
@@ -119,6 +119,7 @@ export default {
         class: '',
         captcha: ''
       },
+      // 校验规则设置
       rules: {
         Sno: [
           { required: true, message: '请输入用户名', trigger: 'blur' },
@@ -171,35 +172,43 @@ export default {
     }
   },
   methods: {
+    // 去登录页面
+    toLogin () {
+      this.$router.push('/')
+    },
     // 点击注册按钮事件
     submitForm () {
-      this.$refs.ruleForm.validate((valid) => {
-        if (valid) {
-          console.log('ok')
-          this.$axios({
-            method: 'post',
-            url: 'http://localhost:2720/api/user/register',
-            data: this.ruleForm,
-            headers: {
-              ctoken: this.ctoken,
-              captcha: this.ruleForm.captcha
-            } })
-            .then(res => {
-              if (res.status === 200) {
-                this.$nextTick(() => {
-                  this.$message.success('注册成功')
-                })
-              } else if (res.status === 401) {
-                this.$message.error(res.data.message)
-              }
-            })
-            .catch(() => {
-              this.$message.error('注册失败，请重新输入')
-            })
-        } else {
-          this.$message.error('输入错误，请再次检查您输入的内容')
-        }
-      })
+      if (this.checked === true) {
+        this.$refs.ruleForm.validate((valid) => {
+          if (valid) {
+            console.log('ok')
+            this.$axios({
+              method: 'post',
+              url: 'http://localhost:2720/api/user/register',
+              data: this.ruleForm,
+              headers: {
+                ctoken: this.ctoken,
+                captcha: this.ruleForm.captcha
+              } })
+              .then(res => {
+                if (res.status === 200) {
+                  this.$nextTick(() => {
+                    this.$message.success('注册成功')
+                  })
+                } else if (res.status === 401) {
+                  this.$message.error(res.data.message)
+                }
+              })
+              .catch(() => {
+                this.$message.error('注册失败，请重新输入')
+              })
+          } else {
+            this.$message.error('输入错误，请再次检查您输入的内容')
+          }
+        })
+      } else {
+        this.$message.error('请阅读《服务条款》')
+      }
     },
     // 刷新验证码图片
     refreshCaptchaImg () {
