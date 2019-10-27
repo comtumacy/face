@@ -6,7 +6,7 @@
         <el-divider></el-divider>
       </div>
       <el-container v-bind:style="{'top': (0.025 * height + 80) + 'px', 'left': (width * 0.131) + 'px', 'width': (0.736 * width) + 'px'}">
-        <el-aside width="55%" v-bind:style="{'height': (0.693 * height) + 'px'}">
+        <el-aside width="65%" v-bind:style="{'height': (0.693 * height) + 'px'}">
           <registerLeft
           class="registerLeft"
           v-bind:width="width"
@@ -49,11 +49,17 @@ export default {
     },
     // 获取浏览器长宽
     getLength () {
-      this.height = document.documentElement.clientHeight
-      this.width = document.documentElement.clientWidth
-      if (document.documentElement.clientWidth < 1300 || document.documentElement.clientHeight < 900) {
-        console.log(document.documentElement.clientHeight, document.documentElement.clientWidth)
-        resizeTo(1300, 800)
+      let height = document.documentElement.clientHeight
+      let width = document.documentElement.clientWidth
+      if (height > 800) {
+        this.height = height
+      } else {
+        this.height = 800
+      }
+      if (width > 1300) {
+        this.width = width
+      } else {
+        this.width = 1300
       }
     }
   },

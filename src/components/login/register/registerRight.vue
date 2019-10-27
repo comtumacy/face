@@ -1,14 +1,17 @@
 <template>
     <div class="registerRight">
-      <el-row>
-        <el-col :span="12">注册新用户</el-col>
-        <el-col :span="12">
+      <el-row class="registerRightRow1" type="flex" justify="space-between">
+        <el-col class="registerRightTitle" :span="12">注册新用户</el-col>
+        <el-col class="registerRightTitle2" :span="12">
           我已经注册，现在就
-          <el-button type="text">登录</el-button>
+          <el-button class="registerRightButton" type="text">登录</el-button>
         </el-col>
       </el-row>
       <el-divider></el-divider>
       <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+        <el-form-item label="学号" prop="Sno">
+          <el-input v-model="ruleForm.Sno"></el-input>
+        </el-form-item>
         <el-form-item label="用户名" prop="username">
           <el-input v-model="ruleForm.username"></el-input>
         </el-form-item>
@@ -18,12 +21,19 @@
         <el-form-item label="确认密码" prop="checkPass">
           <el-input v-model="ruleForm.checkPass" show-password autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="性别" prop="gender">
-          <el-select v-model="ruleForm.gender" placeholder="请选择性别">
-            <el-option label="男" value="男"></el-option>
-            <el-option label="女" value="女"></el-option>
-          </el-select>
+        <el-form-item label="姓名" prop="Sname">
+          <el-input v-model="ruleForm.Sname"></el-input>
         </el-form-item>
+        <el-row>
+          <el-form-item label="性别" prop="Ssex">
+            <el-col>
+              <el-select v-model="ruleForm.Ssex" placeholder="请选择性别">
+                <el-option label="男" value="男"></el-option>
+                <el-option label="女" value="女"></el-option>
+              </el-select>
+            </el-col>
+          </el-form-item>
+        </el-row>
         <el-form-item label="所属科室" prop="department">
           <el-select  v-model="ruleForm.department" placeholder="请选择科室">
             <el-option :label="itemDepartment" :value="itemDepartment" v-for="itemDepartment in department" :key="itemDepartment"></el-option>
@@ -186,5 +196,21 @@ export default {
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus">
-
+.registerRight
+  .registerRightRow1
+    height 26px
+    .registerRightTitle
+      margin-left 20px
+      font-size 22px
+      color rgb(154,154,154)
+    .registerRightTitle2
+      width auto
+      font-size 15px
+      color rgb(154,154,154)
+      .registerRightButton
+        border 0
+        padding 5px
+        font-size 15px
+  .el-divider
+    margin 6px 0 12px 0
 </style>
