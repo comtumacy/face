@@ -6,13 +6,17 @@
         <el-divider></el-divider>
       </div>
       <el-container v-bind:style="{'top': (0.025 * height + 80) + 'px', 'left': (width * 0.131) + 'px', 'width': (0.736 * width) + 'px'}">
-        <el-aside width="55%">
+        <el-aside width="55%" v-bind:style="{'height': (0.693 * height) + 'px'}">
           <registerLeft
-          class="registerLeft"></registerLeft>
+          class="registerLeft"
+          v-bind:width="width"
+          v-bind:height="height" v-bind:style="{'height': (0.693 * height) + 'px'}"></registerLeft>
         </el-aside>
         <el-main>
           <registerRight
-          class="registerRight"></registerRight>
+          class="registerRight"
+          v-bind:width="width"
+          v-bind:height="height"></registerRight>
         </el-main>
       </el-container>
     </div>
@@ -47,7 +51,10 @@ export default {
     getLength () {
       this.height = document.documentElement.clientHeight
       this.width = document.documentElement.clientWidth
-      console.log(document.documentElement.clientHeight, document.documentElement.clientWidth)
+      if (document.documentElement.clientWidth < 1300 || document.documentElement.clientHeight < 900) {
+        console.log(document.documentElement.clientHeight, document.documentElement.clientWidth)
+        resizeTo(1300, 800)
+      }
     }
   },
   mounted () {
@@ -80,7 +87,7 @@ export default {
   .el-container
     position fixed
     .registerLeft
-      position absolute
+      position relative
     .registerRight
-      position absolute
+      position relative
 </style>

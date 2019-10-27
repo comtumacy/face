@@ -58,7 +58,7 @@
 <script type="text/ecmascript-6">
 export default {
   components: {},
-  props: [],
+  props: ['width', 'height'],
   created () {
   },
   data () {
