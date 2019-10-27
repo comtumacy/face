@@ -70,7 +70,7 @@
         </el-checkbox>
       </el-row>
       <el-row>
-        <el-button class="button" type="success">注 册</el-button>
+        <el-button class="button" type="success" v-on:click="submitForm()">注 册</el-button>
       </el-row>
     </div>
 </template>
@@ -108,6 +108,7 @@ export default {
       classes: '',
       checked: false,
       captchaImg: '',
+      ctoken: '',
       ruleForm: {
         username: '',
         password: '',
@@ -139,7 +140,7 @@ export default {
         ],
         Sname: [
           { required: true, message: '请输入姓名', trigger: 'blur' },
-          { min: 5, max: 12, message: '长度在 1 到 10 个字符', trigger: 'blur' }
+          { min: 1, max: 10, message: '长度在 1 到 10 个字符', trigger: 'blur' }
         ],
         Sdept: [
           { required: true, message: '请选择学院', trigger: 'change' }
@@ -171,12 +172,13 @@ export default {
   },
   methods: {
     // 点击注册按钮事件
-    submitForm (ruleForm) {
-      this.$refs[ruleForm].validate((valid) => {
+    submitForm () {
+      this.$refs.ruleForm.validate((valid) => {
         if (valid) {
+          console.log('ok')
           this.$axios({
             method: 'post',
-            url: 'http://yitongli.cn/api/user/register',
+            url: 'http://localhost:2720/api/user/register',
             data: this.ruleForm,
             headers: {
               ctoken: this.ctoken,
@@ -286,6 +288,8 @@ export default {
     margin 6px 0 12px 0
   .selectBox
     margin-left 100px
+  #verificationCodeImg
+    cursor pointer
   .button
     margin-left 100px
     width 78%
