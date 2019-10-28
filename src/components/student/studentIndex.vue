@@ -6,6 +6,7 @@
         <el-menu-item index="3">信息修改</el-menu-item>
       </el-menu>
       <div class="topRight">
+        <span class="usernameTitle">{{ username }}</span>
         <el-tooltip class="item" effect="dark" content="退出登录" placement="bottom">
           <el-button type="info" class="icon-switch" circle v-on:click="outLogin()"></el-button>
         </el-tooltip>
@@ -22,6 +23,7 @@ export default {
   },
   data () {
     return {
+      username: '测试测试测试',
       activeIndex: '1'
     }
   },
@@ -34,7 +36,7 @@ export default {
         this.$router.push('/studentIndex/getFace')
       } else if (index === '2') {
         this.$router.push('/studentIndex/attendanceResults')
-      } else {
+      } else if (index === '2') {
         this.$router.push('/studentIndex/studentModify')
       }
       console.log(index)
@@ -61,4 +63,6 @@ export default {
     position fixed
     top 10px
     right 10px
+    .usernameTitle
+      margin-right 15px
 </style>

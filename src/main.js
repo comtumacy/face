@@ -15,7 +15,7 @@ import store from './store/store'
 // 导入HTTP拦截器
 import './http/http'
 // 按需导入Element UI组件库包
-import { Icon, Button, ButtonGroup, Divider, Row, Col, Input, Checkbox, CheckboxButton, CheckboxGroup, Message, MessageBox, Container, Aside, Main, Form, FormItem, Select, Option, OptionGroup, DropdownMenu, Menu, Submenu, MenuItem, MenuItemGroup, Tooltip } from 'element-ui'
+import { Icon, Button, ButtonGroup, Divider, Row, Col, Input, Checkbox, CheckboxButton, CheckboxGroup, Message, MessageBox, Container, Aside, Main, Form, FormItem, Select, Option, OptionGroup, DropdownMenu, Menu, Submenu, MenuItem, MenuItemGroup, Tooltip, Progress, Table, TableColumn } from 'element-ui'
 
 // 关闭生产模式
 Vue.config.productionTip = false
@@ -53,6 +53,9 @@ Vue.use(Submenu)
 Vue.use(MenuItem)
 Vue.use(MenuItemGroup)
 Vue.use(Tooltip)
+Vue.use(Progress)
+Vue.use(Table)
+Vue.use(TableColumn)
 
 // 挂载
 new Vue({
