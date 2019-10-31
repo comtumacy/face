@@ -94,6 +94,7 @@ export default {
   computed: {},
   watch: {},
   methods: {
+    // 打开媒体流
     openMedia () {
       if (navigator.mediaDevices.getUserMedia || navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia) {
         //  调用用户媒体设备, 访问摄像头
@@ -115,11 +116,18 @@ export default {
           })
       }
     },
+    // 按下拍照事件
     enterClick () {
       let canvas = this.$refs.canvas
       let canvasGetContent = canvas.getContext('2d')
       canvasGetContent.drawImage(this.videoShow_mounted, 0, 0, 350, 350)
       console.log(canvas.toDataURL())
+    },
+    upPhoto () {
+      this.$axios({
+        method: 'post',
+        url: ''
+      })
     }
   },
   mounted () {

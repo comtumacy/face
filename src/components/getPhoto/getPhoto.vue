@@ -14,7 +14,7 @@ export default {
   components: {},
   props: [],
   created () {
-    this.openMedia()
+    // this.openMedia()
   },
   data () {
     return {
@@ -50,7 +50,8 @@ export default {
       let canvas = this.$refs.canvas
       let canvasGetContent = canvas.getContext('2d')
       canvasGetContent.drawImage(this.videoShow_mounted, 0, 0, 480, 320)
-      console.log(canvas.toDataURL())
+      let base64Code = String(canvas.toDataURL())
+      console.log(typeof base64Code)
     }
   },
   mounted () {
