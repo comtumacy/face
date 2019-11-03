@@ -11,7 +11,9 @@ const state = {
   token: '',
   // 初始化为未登录
   isLogin: false,
-  row: ''
+  no: '',
+  className: '',
+  classNo: ''
 }
 
 // 用于实时监听state值的变化
@@ -35,8 +37,17 @@ const getters = {
       return state.token
     }
   },
-  row_getters (state) {
-    return state.row
+  no_getters (state) {
+    state.no = sessionStorage.getItem('no')
+    return state.no
+  },
+  className_getters (state) {
+    state.className = sessionStorage.getItem('className')
+    return state.className
+  },
+  classNo_getters (state) {
+    state.classNo = sessionStorage.getItem('classNo')
+    return state.classNo
   }
 }
 
@@ -51,8 +62,20 @@ const mutations = {
     state.token = token
     state.isLogin = true
   },
-  row_mutations (state, row) {
-    state.row = row
+  no_mutations (state, no) {
+    // 把no和是否登录信号传入sessionStorage，sessionStorage生命周期为浏览器打开期间
+    sessionStorage.setItem('no', no)
+    state.no = no
+  },
+  className_mutations (state, className) {
+    // 把no和是否登录信号传入sessionStorage，sessionStorage生命周期为浏览器打开期间
+    sessionStorage.setItem('className', className)
+    state.className = className
+  },
+  classNo_mutations (state, classNo) {
+    // 把no和是否登录信号传入sessionStorage，sessionStorage生命周期为浏览器打开期间
+    sessionStorage.setItem('classNo', classNo)
+    state.classNo = classNo
   }
 }
 
@@ -61,8 +84,14 @@ const actions = {
   token_actions (context, token) {
     context.commit('token_mutations', token)
   },
-  row_actions (context, row) {
-    context.commit('row_mutations', row)
+  no_actions (context, no) {
+    context.commit('no_mutations', no)
+  },
+  className_actions (context, className) {
+    context.commit('className_mutations', className)
+  },
+  classNo_actions (context, classNo) {
+    context.commit('classNo_mutations', classNo)
   }
 }
 

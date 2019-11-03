@@ -1,5 +1,7 @@
 <template>
-    <div class="getFace">
+    <div class="getFace"
+      v-loading.fullscreen.lock="fullscreenLoading"
+      element-loading-text="服务器正在提取人脸特征并保存至数据库，请耐心等待......">
       <div class="left">
         <div>
           <span class="titleTakePhoto">人&nbsp;脸&nbsp;录&nbsp;入</span>
@@ -12,22 +14,27 @@
             class="progress"
             :text-inside="true"
             :stroke-width="24"
-            :percentage="100"
+            :percentage="number * 10"
             status="success"></el-progress>
         </div>
-        <el-button round type="primary" class="leftButton" v-on:click="enterClick()">拍&nbsp;照</el-button>
+        <el-button round type="primary" class="leftButton" v-on:click="enterClick()" v-bind:disabled="selectEnterClick">拍&nbsp;照</el-button>
       </div>
       <div class="middle">
         <div class="titleGetPhoto">拍&nbsp;照&nbsp;结&nbsp;果</div>
-        <div class="geiPhoto">
+        <div class="geiPhoto"
+           v-loading="loading"
+           element-loading-text="照片正在上传至服务器，请等待"
+           element-loading-spinner="el-icon-loading"
+           element-loading-background="rgba(0, 0, 0, 0.8)"
+        >
           <canvas id="canvas" ref="canvas" width="350" height="350"></canvas>
         </div>
         <div class="message">
           <span class="message1">已经完成</span>
-          <span class="message2">1/10</span>
+          <span class="message2">{{ number }}/10</span>
         </div>
-        <el-button class="middleButton1" type="success" round>上传保存</el-button>
-        <el-button class="middleButton2" type="warning" round>识别模型</el-button>
+        <el-button class="middleButton1" type="success" round v-on:click="upPhoto()" v-bind:disabled="selectEnterClick">上传保存</el-button>
+        <el-button class="middleButton2" type="warning" round v-bind:disabled="!selectEnterClick" v-on:click="features_train_person()" >识别模型</el-button>
       </div>
       <div class="right">
         <div class="rightTitle">学生信息</div>
@@ -49,9 +56,9 @@
             align="center">
           </el-table-column>
         </el-table>
-        <div class="status">此次录入状态：</div>
-        <span class="el-icon-check"></span>
-        <span class="el-icon-close"></span>
+        <div class="status">此次模型识别状态：</div>
+        <span class="el-icon-check" v-show="successSign"></span>
+        <span class="el-icon-close" v-show="!successSign"></span>
       </div>
     </div>
 </template>
@@ -62,32 +69,40 @@ export default {
   props: [],
   created () {
     this.openMedia()
+    this.get_student_info()
+    this.find_features()
   },
   data () {
     return {
       video: { video: { width: 500, height: 500 } },
       videoShow_mounted: {},
+      dataUrl: '',
+      number: 0,
+      loading: false,
+      selectEnterClick: false,
+      fullscreenLoading: false,
+      successSign: false,
       tableData: [{
         date: '学号',
-        name: '201606401201'
+        name: ''
       }, {
         date: '姓名',
-        name: '王小虎'
+        name: ''
       }, {
         date: '性别',
-        name: '男'
+        name: ''
       }, {
         date: '学院',
-        name: '计算机科学与技术学院'
+        name: ''
       }, {
         date: '班级',
-        name: '计算机科学与技术162班'
+        name: ''
       }, {
         date: '生日',
-        name: '2016-01-01'
+        name: ''
       }, {
         date: '是否已经录入人脸信息',
-        name: '是'
+        name: ''
       }]
     }
   },
@@ -103,7 +118,7 @@ export default {
         alert('不支持访问用户媒体')
       }
     },
-    //  访问用户媒体设备的兼容方法
+    // 访问用户媒体设备的兼容方法
     getUserMedia () {
       if (navigator.mediaDevices.getUserMedia) {
         //  最新的标准API
@@ -121,12 +136,96 @@ export default {
       let canvas = this.$refs.canvas
       let canvasGetContent = canvas.getContext('2d')
       canvasGetContent.drawImage(this.videoShow_mounted, 0, 0, 350, 350)
-      console.log(canvas.toDataURL())
+      let DataURL = canvas.toDataURL()
+      DataURL = DataURL.replace('data:image/png;base64,', '')
+      this.dataUrl = DataURL
     },
+    // 上传照片
     upPhoto () {
+      this.loading = true
       this.$axios({
         method: 'post',
-        url: ''
+        url: 'http://106.54.119.102/api/student/get_photo',
+        headers: {
+          'Sno': this.$store.getters.no_getters,
+          'token': this.$store.getters.token_getters,
+          'number': this.number
+        },
+        data: {
+          'base64': this.dataUrl
+        }
+      }).then(res => {
+        this.loading = false
+        if (res.status === 200) {
+          this.$message.success(res.data.info)
+          this.number = this.number + 1
+          if (this.number === 10) {
+            this.selectEnterClick = true
+          }
+        } else {
+          this.$message.error(res.data.info)
+        }
+      })
+    },
+    // 获取当前学生的个人信息
+    get_student_info () {
+      this.$axios({
+        method: 'post',
+        url: 'http://106.54.119.102/api/student/get_student_info',
+        headers: {
+          'Sno': this.$store.getters.no_getters,
+          'token': this.$store.getters.token_getters
+        }
+      }).then(res => {
+        this.tableData[0].name = res.data[0].Sno
+        this.tableData[1].name = res.data[0].Sname
+        this.tableData[2].name = res.data[0].Ssex
+        this.tableData[3].name = res.data[0].Sdept
+        this.tableData[4].name = res.data[0].Sclass + res.data[0].Sclassno + '班'
+        this.tableData[5].name = res.data[0].Birth
+        this.$store.dispatch('className_actions', res.data[0].Sclass)
+        this.$store.dispatch('classNo_actions', res.data[0].Sclassno)
+      })
+    },
+    // 查询是否该学生已经存在人脸特征
+    find_features () {
+      this.$axios({
+        method: 'post',
+        url: 'http://106.54.119.102/api/student/find_features',
+        headers: {
+          'Sno': this.$store.getters.no_getters,
+          'token': this.$store.getters.token_getters
+        },
+        data: {
+          'class': this.$store.getters.className_getters,
+          'classno': this.$store.getters.classNo_getters
+        }
+      }).then(res => {
+        this.tableData[6].name = res.data.info
+      })
+    },
+    // 获取保存人脸特征
+    features_train_person () {
+      this.fullscreenLoading = true
+      this.$axios({
+        method: 'post',
+        url: 'http://106.54.119.102/api/student/features_train_person',
+        headers: {
+          'Sno': this.$store.getters.no_getters,
+          'token': this.$store.getters.token_getters
+        },
+        data: {
+          'class': this.$store.getters.className_getters,
+          'classno': this.$store.getters.classNo_getters
+        }
+      }).then(res => {
+        this.fullscreenLoading = false
+        if (res.status === 200) {
+          this.$message.success(res.data.info)
+          this.successSign = true
+        } else {
+          this.$message.error(res.data.info)
+        }
       })
     }
   },
@@ -207,27 +306,27 @@ export default {
       position fixed
       font-size 40px
       top 110px
-      right 250px
+      left 1520px
     .rightTable
       position: fixed
       top 200px
-      right 130px
+      left 1390px
       width 401px
     .status
       position fixed
       top 650px
-      right 170px
+      left 1420px
       font-size 40px
     .el-icon-check
       position: fixed
       top 750px
-      right 300px
+      left 1550px
       font-size 80px
       color rgb(103,194,58)
     .el-icon-close
       position: fixed
       top 750px
-      right 300px
+      left 1550px
       font-size 80px
       color rgb(245,108,108)
 </style>

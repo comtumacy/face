@@ -71,7 +71,7 @@ export default {
     getCaptchaImg () {
       this.$axios({
         method: 'post',
-        url: 'http://localhost:2720/face/user/verification_code'
+        url: 'http://106.54.119.102:80/api/user/verification_code'
       }).then(res => {
         this.ctoken = res.headers.ctoken
         this.captchaImg = res.data.base64
@@ -95,7 +95,7 @@ export default {
       if (this.checked === false) {
         this.$axios({
           method: 'post',
-          url: 'http://localhost:2720/face/user/login',
+          url: 'http://106.54.119.102:80/api/user/login',
           headers: { 'ctoken': this.ctoken, 'code': this.verificationCode },
           data: {
             'Sno': Number(this.no),
@@ -105,6 +105,9 @@ export default {
         }).then(res => {
           if (res.status === 200) {
             this.$message.success(res.data.info)
+            this.$store.dispatch('token_actions', res.headers.token)
+            this.$store.dispatch('no_actions', this.no)
+            this.$router.push('/studentIndex')
           } else if (res.status === 401) {
             this.$message.error(res.data.info)
           }
@@ -115,7 +118,7 @@ export default {
       } else {
         this.$axios({
           method: 'post',
-          url: 'http://localhost:2720/face/user/login_teacher',
+          url: 'http://106.54.119.102:80/api/user/login_teacher',
           headers: { 'ctoken': this.ctoken, 'code': this.verificationCode },
           data: {
             'Tno': Number(this.no),
@@ -125,6 +128,9 @@ export default {
         }).then(res => {
           if (res.status === 200) {
             this.$message.success(res.data.info)
+            this.$store.dispatch('token_actions', res.headers.token)
+            this.$store.dispatch('no_actions', this.no)
+            this.$router.push('/teacherIndex')
           } else if (res.status === 401) {
             this.$message.error(res.data.info)
           }

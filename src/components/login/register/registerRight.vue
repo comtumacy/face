@@ -46,8 +46,11 @@
         <el-row>
           <el-form-item label="所属班级" prop="class">
             <el-col>
-              <el-select  v-model="ruleForm.class" placeholder="请选择班级" v-bind:style="{'width': '100%'}">
+              <el-select  v-model="ruleForm.Sclass" placeholder="请选择班级" v-bind:style="{'width': '45%'}">
                 <el-option :label="itemClass" :value="itemClass" v-for="itemClass in classes" :key="itemClass"></el-option>
+              </el-select>
+              <el-select  v-model="ruleForm.Sclassno" placeholder="请选择班号" v-bind:style="{'width': '45%', 'left': '10%'}">
+                <el-option :label="itemClass" :value="itemClass" v-for="itemClass in classesNo" :key="itemClass"></el-option>
               </el-select>
             </el-col>
           </el-form-item>
@@ -106,6 +109,7 @@ export default {
     return {
       college: '',
       classes: '',
+      classesNo: '',
       checked: false,
       captchaImg: '',
       ctoken: '',
@@ -116,13 +120,14 @@ export default {
         Sname: '',
         Ssex: '',
         Sdept: '',
-        class: '',
+        Sclass: '',
+        Sclassno: '',
         captcha: ''
       },
       // 校验规则设置
       rules: {
         Sno: [
-          { required: true, message: '请输入用户名', trigger: 'blur' },
+          { required: true, message: '请输入学号', trigger: 'blur' },
           { min: 12, max: 12, message: '长度为 12 个数字', trigger: 'blur' }
         ],
         username: [
@@ -146,8 +151,11 @@ export default {
         Sdept: [
           { required: true, message: '请选择学院', trigger: 'change' }
         ],
-        class: [
+        Sclass: [
           { required: true, message: '请选择班级', trigger: 'change' }
+        ],
+        Sclassno: [
+          { required: true, message: '请选择班号', trigger: 'change' }
         ],
         Ssex: [
           { required: true, message: '请选择性别', trigger: 'change' }
@@ -181,26 +189,29 @@ export default {
       if (this.checked === true) {
         this.$refs.ruleForm.validate((valid) => {
           if (valid) {
-            console.log('ok')
             this.$axios({
               method: 'post',
-              url: 'http://localhost:2720/api/user/register',
+              url: 'http://106.54.119.102:80/api/user/register',
               data: this.ruleForm,
               headers: {
                 ctoken: this.ctoken,
-                captcha: this.ruleForm.captcha
-              } })
+                code: this.ruleForm.captcha
+              }
+            })
               .then(res => {
+                console.log(res)
                 if (res.status === 200) {
                   this.$nextTick(() => {
                     this.$message.success('注册成功')
                   })
                 } else if (res.status === 401) {
-                  this.$message.error(res.data.message)
+                  this.$message.error(res.data.info)
                 }
               })
-              .catch(() => {
-                this.$message.error('注册失败，请重新输入')
+              .catch(err => {
+                console.log(err)
+                console.log(0)
+                this.$message.error(err.data.info)
               })
           } else {
             this.$message.error('输入错误，请再次检查您输入的内容')
@@ -219,7 +230,7 @@ export default {
     getCaptchaImg () {
       this.$axios({
         method: 'post',
-        url: 'http://localhost:2720/face/user/verification_code'
+        url: 'http://106.54.119.102:80/api/user/verification_code'
       }).then(res => {
         this.ctoken = res.headers.ctoken
         this.captchaImg = res.data.base64
@@ -232,7 +243,7 @@ export default {
     getCollege () {
       this.$axios({
         method: 'post',
-        url: 'http://localhost:2720/face/public/get_college'
+        url: 'http://106.54.119.102:80/api/public/get_college'
       }).then(res => {
         if (res.status === 200) {
           let list = []
@@ -251,21 +262,34 @@ export default {
     getClass () {
       this.$axios({
         method: 'post',
-        url: 'http://localhost:2720/face/public/get_class',
+        url: 'http://106.54.119.102:80/api/public/get_class',
         data: { 'college': this.ruleForm.Sdept }
       }).then(res => {
         if (res.status === 200) {
-          let list = []
+          let listClass = []
+          let listClassNo = []
           for (let i = 0; i < res.data.length; i++) {
-            list.push(res.data[i].Cid + res.data[i].Cname)
+            listClass.push(res.data[i].Cid)
+            listClassNo.push(res.data[i].Cname)
           }
-          this.classes = list
+          this.classes = this.unique(listClass)
+          this.classesNo = this.unique(listClassNo)
         } else {
           this.$message.error('获取班级数据失败，请检查你的网络连接')
         }
       }).catch(err => {
         console.log(err)
       })
+    },
+    // 去除重复值
+    unique (arr) {
+      let hash = []
+      for (let i = 0; i < arr.length; i++) {
+        if (hash.indexOf(arr[i]) === -1) {
+          hash.push(arr[i])
+        }
+      }
+      return hash
     }
   },
   mounted () {

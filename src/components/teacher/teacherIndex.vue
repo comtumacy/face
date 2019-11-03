@@ -1,9 +1,9 @@
 <template>
-    <div class="studentIndex">
+    <div class="teacherIndex">
       <el-menu :default-active="activeIndex" class="el-menu" mode="horizontal" @select="handleSelect">
-        <el-menu-item index="1">人脸录入</el-menu-item>
+        <el-menu-item index="1">人脸考勤</el-menu-item>
         <el-menu-item index="2">考勤信息</el-menu-item>
-        <el-menu-item index="3">信息修改</el-menu-item>
+        <el-menu-item index="3">班级创建</el-menu-item>
       </el-menu>
       <div class="topRight">
         <span class="usernameTitle">{{ username }}</span>
@@ -20,11 +20,11 @@ export default {
   components: {},
   props: [],
   created () {
-    this.get_student_info()
+    this.username = '欢迎：' + this.$store.getters.no_getters + '教工号'
   },
   data () {
     return {
-      username: '',
+      username: 0,
       activeIndex: '1'
     }
   },
@@ -34,25 +34,12 @@ export default {
     // 导航栏点击事件
     handleSelect (index) {
       if (index === '1') {
-        this.$router.push('/studentIndex/getFace')
+        this.$router.push('/teacherIndex/faceDistinguish')
       } else if (index === '2') {
-        this.$router.push('/studentIndex/attendanceResults')
+        this.$router.push('/teacherIndex/attendanceResultsTeacher')
       } else if (index === '3') {
-        this.$router.push('/studentIndex/studentModify')
+        this.$router.push('/teacherIndex/createClass')
       }
-    },
-    // 获取用户名
-    get_student_info () {
-      this.$axios({
-        method: 'post',
-        url: 'http://106.54.119.102/api/student/get_student_info',
-        headers: {
-          'Sno': this.$store.getters.no_getters,
-          'token': this.$store.getters.token_getters
-        }
-      }).then(res => {
-        this.username = '欢迎：' + res.data[0].Sname
-      })
     },
     // 退出登录
     outLogin () {
@@ -74,7 +61,7 @@ export default {
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus">
-.studentIndex
+.teacherIndex
   .el-menu
     background-color rgb(241,241,241)
     > li
